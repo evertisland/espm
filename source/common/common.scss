@@ -1,0 +1,12 @@
+.common-margin {
+  margin: 20px;
+}
+$common-border: 20px solid gray;
+html, body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: pink;
+  height: 2000px;
+}

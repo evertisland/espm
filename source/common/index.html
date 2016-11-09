@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <div class="wrapper">
+        <form id="loan-application-step-1">
+            <div class="steps-bar">
+                <ul>
+                    <li value="1" class="active">1</li>
+                    <li value="2">2</li>
+                    <li value="3">3</li>
+                </ul>
+            </div>
+
+            <div class="sub-step active" data-step-nr="1" data-step-name="personal-details">
+
+                <h3 class="h4 sub-step-heading"><?= _x('Personal Details', 'loan-application', 'bigbank') ?></h3>
+
+                <div class="sub-sections-wrapper">
+
+                  <div class="sub-section loan-details">
+
+                      <h2 class="first-heading"><?= _x('Loan Details', 'loan-application', 'bigbank') ?></h2>
+
+                      <div class="row no-sides widest">
+                          <div class="col col-9-24">
+                              <?php
+                                  (new InputField())->setLabelText(_x('Loan amount', 'loan-application', 'bigbank'))
+                                      ->setType('tel')
+                                      ->setId('loan-amount')
+                                      ->setTooltip(_x('<p>Loan amount tooltip</p>', 'loan-application', 'bigbank'))
+                                      ->setValidators('not_empty|loan_amount')
+                                      ->setInputAttribute('data-input-mask', 'positiveInteger')
+                                      ->setInputAttribute('data-min-value', LoanAmount::$amountFi['min'])
+                                      ->setInputAttribute('data-max-value', LoanAmount::$amountFi['max'])
+                                      ->setInputAttribute('required', 'required')->render(); ?>
+                          </div>
+
+                          <div class="col col-9-24">
+                              <?php
+
+                              $loanMaturityOptions = [];
+                              $loanMaturityFi = LoanMaturity::$maturityFi;
+
+                              for ($x = $loanMaturityFi['min']; $x <= $loanMaturityFi['max']; $x++) {
+                                  $loanMaturityOptions[$x] = $x;
+                              }
+
+                              (new SelectField())->setLabelText(_x('Loan maturity', 'loan-application', 'bigbank'))
+                                  ->setId('loan-maturity')
+                                  ->setTooltip(_x('<p>Loan maturity tooltip</p>', 'loan-application', 'bigbank'))
+                                  ->setValidators('not_empty|loan_maturity')
+                                  ->setInputAttribute('required', 'required')
+                                  ->setOptionsWithEmptyDefault($loanMaturityOptions)
+                                  ->render(); ?>
+                          </div>
+
+                          <div class="col col-5-24">
+                              <div class="loan-calculator">
+                                  <p class="small"><?= _x('Monthly Payment', 'loan-application', 'bigbank') ?></p>
+                                  <p><span class="payment" id="js-monthly-payment">0</span> <span class="currency">€</span></p>
+                              </div>
+                          </div>
+
+                      </div>
+
+                      <div class="row no-sides widest">
+
+                          <div class="col col-9-24">
+                              <?php
+                              (new SelectField())->setLabelText(_x('Loan purpose', 'loan-application', 'bigbank'))
+                                  ->setId('loan-purpose')
+                                  ->setValidators('loan_purpose|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->setOptionsWithEmptyDefault((new LoanPurpose)->loanPurposesFi)
+                                  ->render(); ?>
+                          </div>
+
+                      </div>
+
+                    </div>
+
+                    <div class="sub-section applicant-details">
+
+                      <h2><?= _x('Applicant Details', 'loan-application', 'bigbank') ?></h2>
+
+                      <div class="row no-sides widest">
+                          <div class="col col-9-24">
+                              <?php
+                              (new InputField())->setLabelText(_x('First name', 'loan-application', 'bigbank'))
+                                  ->setType('text')
+                                  ->setId('first-name')
+                                  ->setValidators('applicant_name|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->render(); ?>
+                          </div>
+                          <div class="col col-9-24">
+                              <?php
+                              (new InputField())->setLabelText(_x('Surname', 'loan-application', 'bigbank'))
+                                  ->setType('text')
+                                  ->setId('surname')
+                                  ->setValidators('applicant_name|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->render(); ?>
+                          </div>
+                      </div>
+
+                      <div class="row no-sides widest">
+                          <div class="col col-9-24">
+                              <?php
+                              (new InputField())->setLabelText(_x('Identity code', 'loan-application', 'bigbank'))
+                                  ->setType('text')
+                                  ->setId('identity-code')
+                                  ->setValidators('id_code_fin|not_empty')
+                                  ->setTooltip(_x('<p>Personal identity code tooltip</p>', 'loan-application', 'bigbank'))
+                                  ->setInputAttribute('required', 'required')
+                                  ->render(); ?>
+                          </div>
+                          <div class="col col-9-24">
+                              <?php
+                              (new InputField())->setLabelText(_x('E-mail', 'loan-application', 'bigbank'))
+                                  ->setType('email')
+                                  ->setId('email')
+                                  ->setValidators('not_empty|email')
+                                  ->setInputAttribute('required', 'required')
+                                  ->render(); ?>
+                          </div>
+                      </div>
+
+                      <div class="row no-sides widest">
+                          <div class="col col-9-24">
+                              <?php
+                              (new InputField())->setLabelText(_x('Phone', 'loan-application', 'bigbank'))
+                                  ->setType('tel')
+                                  ->setId('phone-number')
+                                  ->setInputAttribute('data-value-type', 'mobileFi')
+                                  ->setValidators('applicant_phone|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->render(); ?>
+                          </div>
+                          <div class="col col-9-24">
+                              <?php
+                              (new SelectField())->setLabelText(_x('Marital status', 'loan-application', 'bigbank'))
+                                  ->setId('marital-status')
+                                  ->setValidators('marital_status|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->setInputAttribute('data-toggle-co-applicant', MaritalStatus::getCoApplicantToggleLovsAsJson())
+                                  ->setOptionsWithEmptyDefault((new MaritalStatus())->maritalStatusesFi)
+                                  ->render(); ?>
+                          </div>
+                      </div>
+
+                      <div class="row no-sides widest">
+                          <div class="col col-9-24">
+                              <?php
+                              (new SelectField())->setLabelText(_x('Number of dependants', 'loan-application', 'bigbank'))
+                                  ->setId('dependants')
+                                  ->setValidators('dependants|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->setOptionsWithEmptyDefault((new Dependants())->numberOfDependantsOptionsFi)
+                                  ->render(); ?>
+                          </div>
+                          <div class="col col-9-24">
+                              <?php
+                              (new SelectField())->setLabelText(_x('Residence type', 'loan-application', 'bigbank'))
+                                  ->setId('residence-type')
+                                  ->setValidators('residence_type|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->setOptionsWithEmptyDefault((new ResidenceType())->residenceTypesFi)
+                                  ->render(); ?>
+                          </div>
+                          <div class="col col-9-24 js-residence-type-specified hidden">
+                              <?php
+                              (new InputField())->setLabelText(_x('Specify residence type', 'loan-application', 'bigbank'))
+                                  ->setType('text')
+                                  ->setId('residence-type-specified')
+                                  ->setValidators('alpha|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->render(); ?>
+                          </div>
+                      </div>
+
+                      <div class="row no-sides widest">
+                          <div class="col col-9-24">
+                              <?php
+                              (new SelectField())->setLabelText(_x('Education', 'loan-application', 'bigbank'))
+                                  ->setId('education-type')
+                                  ->setValidators('education_type|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->setOptionsWithEmptyDefault((new EducationType())->educationTypesFi)
+                                  ->render(); ?>
+                          </div>
+                          <div class="col col-9-24">
+                              <?php
+                              (new SelectField())->setLabelText(_x('Field of activity', 'loan-application', 'bigbank'))
+                                  ->setId('field-of-activity')
+                                  ->setValidators('field_of_activity|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->setOptionsWithEmptyDefault((new FieldOfActivity())->fieldOfActivityValuesFi)
+                                  ->render(); ?>
+                          </div>
+                      </div>
+
+                      <div class="row no-sides widest">
+                          <div class="col col-9-24 js-employer-name hidden">
+                              <?php
+                              (new InputField())->setLabelText(_x('Employer\'s name', 'loan-application', 'bigbank'))
+                                  ->setType('text')
+                                  ->setId('employer-name')
+                                  ->setValidators('employer|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->render(); ?>
+                          </div>
+                          <div class="col col-9-24 js-work-start-date hidden">
+                              <?php
+                              (new InputField())->setLabelText(_x('Work start date', 'loan-application', 'bigbank'))
+                                  ->setType('text')
+                                  ->setId('work-start-date')
+                                  ->setValidators('work_date|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->render(); ?>
+                          </div>
+                      </div>
+
+                      <div class="row no-sides widest">
+                          <div class="col col-9-24 js-company-reg-number hidden">
+                              <?php
+                              (new InputField())->setLabelText(_x('Company\'s registration number', 'loan-application', 'bigbank'))
+                                  ->setType('text')
+                                  ->setId('company-reg-number')
+                                  ->setValidators('company_reg_code|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->render(); ?>
+                          </div>
+                          <div class="col col-9-24 js-company-founding-date hidden">
+                              <?php
+                              (new InputField())->setLabelText(_x('Company\'s founding date', 'loan-application', 'bigbank'))
+                                  ->setType('text')
+                                  ->setId('company-founding-date')
+                                  ->setValidators('work_date|not_empty')
+                                  ->setInputAttribute('required', 'required')
+                                  ->render(); ?>
+                          </div>
+                      </div>
+
+                      <div class="row no-sides widest checkboxes">
+                          <div class="col col-18-24">
+                              <ul>
+                                  <li class="js-add-co-applicant hidden">
+                                      <?php
+                                      (new CheckboxField())->setLabel(_x('I want to add co-applicant details. Co-applicant details are optional, but facilitate the granting of a larger loan amount.', 'loan-application', 'bigbank'))
+                                          ->setId('add-co-applicant')
+                                          ->render();
+                                      ?>
+                                  </li>
+                                  <li>
+                                      <?php
+                                      (new CheckboxField())->setLabel(_x('I want to receive newsletters and advertisements from Bigbank.', 'loan-application', 'bigbank'))
+                                          ->setId('send-newsletters-advertisements')
+                                          ->render();
+                                      ?>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+
+                  </div>
+
+                    <div class="row sub-section">
+                        <div class="col col-24-24">
+                            <p class="action-button"><a
+                                    class="btn green js-submit-sub-step"><?= _x('Submit', 'loan-application', 'bigbank') ?></a>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="sub-step" data-step-nr="2" data-step-name="financial-details">
+
+                <h3 class="h4 sub-step-heading"><?= _x('Financial Details', 'loan-application', 'bigbank') ?></h3>
+
+                <div class="sub-sections-wrapper">
+
+                    <?php include_once('Sub-section/applicant-incomes.php'); ?>
+
+                    <?php include_once('Sub-section/applicant-obligations.php'); ?>
+
+
+                    <div class="row sub-section">
+                        <div class="col col-24-24">
+                            <p class="action-button"><a
+                                    class="btn green js-submit-sub-step"><?= _x('Submit', 'loan-application', 'bigbank') ?></a>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="sub-step hidden" data-step-nr="3" data-step-name="co-applicant-details">
+
+                <h3 class="h4 sub-step-heading"><?= _x('Co-Applicant Details', 'loan-application', 'bigbank') ?></h3>
+
+                <div class="sub-sections-wrapper">
+
+                    <?php include_once('Sub-section/co-applicant-details.php'); ?>
+
+                    <?php include_once('Sub-section/co-applicant-incomes.php'); ?>
+
+                    <?php include_once('Sub-section/co-applicant-obligations.php'); ?>
+
+                    <div class="row sub-section">
+                        <div class="col col-24-24">
+                            <p class="action-button"><a
+                                    class="btn green js-submit-sub-step"><?= _x('Submit', 'loan-application', 'bigbank') ?></a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="toggle-sub-sections-wrapper">
+
+                        <div class="sub-section">
+
+                            <h2 class="h1 hidden"><?= _x('Co-Applicant Details', 'loan-application', 'bigbank') ?></h2>
+
+                            <div class="row">
+                                <div class="col col-18-24">
+                                    <?php
+                                    $checkbox = new CheckboxField();
+                                    $checkbox->setLabel(_x('I decided not to include the co-applicant.', 'loan-application', 'bigbank'))
+                                        ->setId('exclude-co-applicant')
+                                        ->render();
+                                    ?>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="sub-section row hidden">
+                            <div class="col col-24-24">
+                                <p class="action-button"><a
+                                   class="btn green js-submit-sub-step"><?= _x('Submit', 'loan-application', 'bigbank') ?></a>
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="sub-step" data-step-nr="3" data-step-name="confirmations">
+
+                <h3 class="h4 sub-step-heading"><?= _x('Confirmations', 'loan-application', 'bigbank') ?></h3>
+
+                <div class="sub-sections-wrapper">
+
+                    <?php include_once('Sub-section/confirmations.php'); ?>
+
+                    <div class="row sub-section">
+                        <div class="col col-24-24">
+                            <p class="action-button"><a
+                                    class="btn green js-submit-sub-step"><?= _x('Submit', 'loan-application', 'bigbank') ?></a>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+    </div>
+  </body>
+</html>
